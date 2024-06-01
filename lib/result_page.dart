@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'routes.dart';
 
 class ResultPage extends StatelessWidget {
   final String diseaseName;
@@ -84,7 +85,11 @@ class ResultPage extends StatelessWidget {
                 child: IconButton(
                   icon: Icon(Icons.close, color: Colors.red),
                   onPressed: () {
-                    Navigator.popUntil(context, ModalRoute.withName('/checkup'));
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => Routes.routes['/home']!(context)),
+                          (Route<dynamic> route) => false,
+                    );
                   },
                 ),
               ),
