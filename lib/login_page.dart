@@ -1,8 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:slicing/home_page.dart';
-import 'register_page.dart';
+import 'package:slicing/register_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginPage extends StatelessWidget {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  Future<void> signInWithEmailPassword(
+      BuildContext context, String email, String password) async {
+    try {
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+      );
+    } catch (e) {
+      print(e);
+      // Handle sign-in errors here
+    }
+  }
+
+  Future<void> signInWithGoogle(BuildContext context) async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser!.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+      final UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithCredential(credential);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+      );
+    } catch (e) {
+      print(e);
+      // Handle sign-in errors here
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,6 +83,7 @@ class LoginPage extends StatelessWidget {
                   ),
                   SizedBox(height: 50),
                   TextField(
+                    controller: emailController,
                     decoration: InputDecoration(
                       labelText: 'Enter Username or email',
                       labelStyle: TextStyle(
@@ -60,6 +105,7 @@ class LoginPage extends StatelessWidget {
                   ),
                   SizedBox(height: 24),
                   TextField(
+                    controller: passwordController,
                     obscureText: true,
                     decoration: InputDecoration(
                       labelText: 'Enter Password',
@@ -101,15 +147,15 @@ class LoginPage extends StatelessWidget {
                   SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => HomePage()),
-                      );
+                      signInWithEmailPassword(context, emailController.text,
+                          passwordController.text);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFF407BFF),
                       padding: EdgeInsets.symmetric(
-                          vertical: 14.0, horizontal: 132.0),
+                        vertical: 14.0,
+                        horizontal: 132.0,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(6.0),
                       ),
@@ -158,9 +204,24 @@ class LoginPage extends StatelessWidget {
                       _buildSocialLoginButton('images/facebook.png', () {
                         // Handle Facebook login
                       }),
-                      _buildSocialLoginButton('images/google.png', () {
-                        // Handle Google login
-                      }),
+                      GestureDetector(
+                        onTap: () => signInWithGoogle(context),
+                        child: Container(
+                          width: 85,
+                          height: 70,
+                          decoration: BoxDecoration(
+                            color: Color(0xFFE8ECF4),
+                            borderRadius: BorderRadius.circular(8.0),
+                            border: Border.all(
+                              color: Color(0xFFE8ECF4),
+                            ),
+                          ),
+                          child: Center(
+                            child: Image.asset('images/google.png',
+                                width: 40, height: 40),
+                          ),
+                        ),
+                      ),
                       _buildSocialLoginButton('images/apple.png', () {
                         // Handle Apple login
                       }),
@@ -182,7 +243,8 @@ class LoginPage extends StatelessWidget {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => RegisterPage()),
+                            MaterialPageRoute(
+                                builder: (context) => RegisterPage()),
                           );
                         },
                         child: Text(

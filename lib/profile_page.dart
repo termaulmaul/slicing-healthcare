@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
+import 'routes.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({Key? key}) : super(key: key);
+
+  void _logout(BuildContext context) {
+    // Implement your logout logic here
+    // For example, you can clear user session, navigate to login page, etc.
+    // For simplicity, I'll just navigate back to the login page
+    Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +100,7 @@ class ProfilePage extends StatelessWidget {
             ProfileMenuItem(
               icon: Icons.logout,
               text: 'Log Out',
-              onTap: () {},
+              onTap: () => _logout(context), // Call logout function
             ),
           ],
         ),
